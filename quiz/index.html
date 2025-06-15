@@ -4,15 +4,63 @@
   <meta charset="UTF-8">
   <title>Deepfake Detection Quiz</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 640px; margin: auto; padding: 1em; }
-    .btn { display: inline-block; padding: 0.5em 1em; background: #3366cc; color: #fff; text-decoration: none; border-radius: 4px; }
-    .notice { font-size: 0.9em; color: #666; margin-top: 1em; }
+    body { font-family: sans-serif; max-width: 700px; margin: auto; padding: 1em; }
+    .question { margin-bottom: 2em; }
+    .question img { max-width: 100%; height: auto; display: block; margin-bottom: 0.5em; }
+    .options label { margin-right: 1em; }
+    button { padding: 0.6em 1.2em; font-size: 1em; }
   </style>
 </head>
 <body>
   <h1>Deepfake Detection Quiz</h1>
-  <p>Click the button below to start the quiz. You will be prompted in a terminal-style interface to enter 0 (Real) or 1 (Fake) for each of the 5 images.</p>
-  <a class="btn" href="/cgi-bin/deepfake_quiz.cgi" target="_blank">Start Quiz</a>
-  <p class="notice">Images are located in <code>/quiz/static/</code>. They will open in separate tabs/windows.</p>
+  <p>For each image below, choose whether it is Real or Fake. Then click “Submit Answers.”</p>
+  <form action="/cgi-bin/deepfake_quiz.cgi" method="get">
+    <!-- Question 1 -->
+    <div class="question">
+      <h2>Question 1</h2>
+      <img src="/quiz/static/face1.jpg" alt="Face 1">
+      <div class="options">
+        <label><input type="radio" name="q1" value="0" required> Real</label>
+        <label><input type="radio" name="q1" value="1"> Fake</label>
+      </div>
+    </div>
+    <!-- Question 2 -->
+    <div class="question">
+      <h2>Question 2</h2>
+      <img src="/quiz/static/face2.jpg" alt="Face 2">
+      <div class="options">
+        <label><input type="radio" name="q2" value="0" required> Real</label>
+        <label><input type="radio" name="q2" value="1"> Fake</label>
+      </div>
+    </div>
+    <!-- Question 3 -->
+    <div class="question">
+      <h2>Question 3</h2>
+      <img src="/quiz/static/face3.jpg" alt="Face 3">
+      <div class="options">
+        <label><input type="radio" name="q3" value="0" required> Real</label>
+        <label><input type="radio" name="q3" value="1"> Fake</label>
+      </div>
+    </div>
+    <!-- Question 4 -->
+    <div class="question">
+      <h2>Question 4</h2>
+      <img src="/quiz/static/face4.jpg" alt="Face 4">
+      <div class="options">
+        <label><input type="radio" name="q4" value="0" required> Real</label>
+        <label><input type="radio" name="q4" value="1"> Fake</label>
+      </div>
+    </div>
+    <!-- Question 5 -->
+    <div class="question">
+      <h2>Question 5</h2>
+      <img src="/quiz/static/face5.jpg" alt="Face 5">
+      <div class="options">
+        <label><input type="radio" name="q5" value="0" required> Real</label>
+        <label><input type="radio" name="q5" value="1"> Fake</label>
+      </div>
+    </div>
+    <button type="submit">Submit Answers</button>
+  </form>
 </body>
 </html>
