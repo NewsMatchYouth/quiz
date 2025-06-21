@@ -1,26 +1,39 @@
+# File: start.sh
+#!/usr/bin/env bash
+# start.sh — Launch Python built-in server in CGI mode
+
+# Ensure the CGI script is executable
+chmod +x cgi-bin/deepfake_quiz.cgi
+
+# Start HTTP server on the port provided by Render (or default to 8000)
+exec python3 -m http.server "${PORT:-8000}" --cgi
+
+
+# -------------------------------
+# File: cgi-bin/deepfake_quiz.cgi
 #!/usr/bin/env bash
 # deepfake_quiz.cgi — Bash CGI script for scoring the 5-image quiz
-# place this file in cgi-bin/ and chmod 755 it
+# Place this file in cgi-bin/ and chmod 755 it
 
-# 1) HTTP ヘッダー
+# 1) HTTP header
 echo "Content-Type: text/html; charset=UTF-8"
 echo ""
 
-# 2) 正解配列 (0=Real, 1=Fake)
+# 2) Correct answers array (0=Real, 1=Fake)
 ANS=(1 0 1 0 1)
 score=0
 total=${#ANS[@]}
 
-# 3) GET パラメータから q1…q5 の値を取り出して採点
+# 3) Parse GET parameters q1…q5 from QUERY_STRING and score
 for i in $(seq 1 $total); do
-  # sed で URLデコード抜き出し
+  # URL-decode and extract parameter value
   val=$(echo "$QUERY_STRING" | sed -n "s/.*q$i=\([^&]*\).*/\1/p")
   if [ "$val" = "${ANS[$((i-1))]}" ]; then
     score=$((score + 1))
   fi
 done
 
-# 4) 結果HTMLを出力
+# 4) Output result HTML
 cat <<EOF
 <!DOCTYPE html>
 <html lang="en">
