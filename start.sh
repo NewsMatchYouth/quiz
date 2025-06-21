@@ -1,7 +1,11 @@
-#!/bin/bash
-# 1) CGI スクリプトを FastCGI で動かす
-spawn-fcgi -p 8000 -n /app/cgi-bin/deepfake_quiz.cgi &
-# 2) 静的ファイル（HTML/画像）を Python HTTP サーバーで配信
-python3 -m http.server 8001 --directory /app/quiz &
-# 3) コンテナを停止させない
-wait
+cat > start.sh <<'EOF'
+#!/usr/bin/env bash
+# start.sh — Launch Python built-in server in CGI mode
+
+# Ensure the CGI script is executable
+chmod +x cgi-bin/deepfake_quiz.cgi
+
+# Start HTTP server on PORT (or default 8000) with CGI support
+exec python3 -m http.server "${PORT:-8000}" --cgi
+EOF
+chmod +x start.sh
