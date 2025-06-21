@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # deepfake_quiz.cgi — Bash CGI script for scoring the 5-image quiz
 # place this file in cgi-bin/ and chmod 755 it
 
