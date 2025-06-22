@@ -1,36 +1,22 @@
 #!/usr/bin/env bash
-# deepfake_quiz.cgi — your Bash CGI quiz scorer
+# deepfake_quiz.cgi — Bash CGI script for scoring the quiz with detailed feedback
 
-ANS=(1 0 1 0 1)
+# Configuration
+ANS=(1 0 1 0 1)       # Correct answers (0=Real, 1=Fake)
+LABELS=("Real" "Fake")
 score=0
 total=${#ANS[@]}
 
-
-# -------------------------------
-# File: cgi-bin/deepfake_quiz.cgi
-#!/usr/bin/env bash
-# deepfake_quiz.cgi — Bash CGI script for scoring the 5-image quiz
-# Place this file in cgi-bin/ and chmod 755 it
-
-# 1) HTTP header
-echo "Content-Type: text/html; charset=UTF-8"
-echo ""
-
-# 2) Correct answers array (0=Real, 1=Fake)
-ANS=(1 0 1 0 1)
-score=0
-total=${#ANS[@]}
-
-# 3) Parse GET parameters q1…q5 from QUERY_STRING and score
+# 1) Parse GET parameters into ANSWERS array and compute score
+declare -a ANSWERS
 for i in $(seq 1 $total); do
-  # URL-decode and extract parameter value
-  val=$(echo "$QUERY_STRING" | sed -n "s/.*q$i=\([^&]*\).*/\1/p")
-  if [ "$val" = "${ANS[$((i-1))]}" ]; then
+  ANSWERS[$i]=$(echo "$QUERY_STRING" | sed -n "s/.*q$i=\([^&]*\).*/\1/p")
+  if [ "${ANS[$((i-1))]}" = "${ANSWERS[$i]}" ]; then
     score=$((score + 1))
   fi
 done
 
-# 4) Emit result HTML
+# 2) Emit result page HTML
 cat <<EOF
 <!DOCTYPE html>
 <html lang="en">
@@ -38,38 +24,44 @@ cat <<EOF
   <meta charset="UTF-8">
   <title>Quiz Results</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2em; text-align: center; }
-    .score { font-size: 2em; margin: 1em 0; }
-    .wrong-images img { max-width: 150px; margin: 0.5em; }
-    a.button { display: inline-block; padding: 0.6em 1.2em; background: #3366cc; color: #fff; text-decoration: none; border-radius: 4px; }
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 2em; }
+    .score { font-size: 2em; text-align: center; margin: 1em 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 2em; }
+    th, td { border: 1px solid #ccc; padding: 0.5em; text-align: center; }
+    th { background: #f0f0f0; }
+    .images img { max-width: 120px; height: auto; }
+    .button { display: inline-block; margin: 2em auto; padding: 0.6em 1.2em; background: #3366cc; color: #fff; text-decoration: none; border-radius: 4px; }
   </style>
 </head>
 <body>
   <h1>Your Quiz Results</h1>
   <p class="score">You scored <strong>$score</strong> out of <strong>$total</strong>.</p>
+  <h2>Details</h2>
+  <table>
+    <tr><th>Q</th><th>Your Answer</th><th>Correct Answer</th><th>Image</th></tr>
 EOF
 
-# 5) Show wrong images (if any)
-if [ $score -lt $total ]; then
-cat <<IMG
-  <h2>Images you got wrong:</h2>
-  <div class="wrong-images">
-IMG
-  for i in $(seq 1 $total); do
-    val=$(echo "$QUERY_STRING" | sed -n "s/.*q$i=\([^&]*\).*/\1/p")
-    correct=${ANS[$((i-1))]}
-    if [ "$val" != "$correct" ]; then
-      echo "  <img src=\"/quiz/static/face${i}.jpg\" alt=\"Face ${i}\" >"
-    fi
-  done
-cat <<END
-  </div>
-END
-fi
+# 3) Loop through each question for detailed feedback
+for i in $(seq 1 $total); do
+  user=${ANSWERS[$i]}
+  corr=${ANS[$((i-1))]}
+  if [ "$user" = "$corr" ]; then
+    icon="✔️"
+  else
+    icon="❌"
+  fi
+  echo "    <tr>"
+  echo "      <td>$i $icon</td>"
+  echo "      <td>${LABELS[$user]}</td>"
+  echo "      <td>${LABELS[$corr]}</td>"
+  echo "      <td><div class=\"images\"><img src=\"/quiz/static/face${i}.jpg\" alt=\"Face ${i}\"></div></td>"
+  echo "    </tr>"
+done
 
-# 6) Try again link & close HTML
+# 4) Close table and add retry button
 cat <<EOF
-  <a class="button" href="/quiz/index.html">Try Again</a>
+  </table>
+  <p style="text-align:center;"><a class="button" href="/quiz/index.html">Try Again</a></p>
 </body>
 </html>
 EOF
