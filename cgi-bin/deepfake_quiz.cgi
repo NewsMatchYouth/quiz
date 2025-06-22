@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
-# deepfake_quiz.cgi — Bash CGI script for scoring the quiz with detailed feedback
+# deepfake_quiz.cgi — your Bash CGI quiz scorer with detailed feedback
 
-# Configuration
-ANS=(1 0 1 0 1)       # Correct answers (0=Real, 1=Fake)
+# 1) HTTP header (required for python3 -m http.server --cgi)
+echo "Content-Type: text/html; charset=UTF-8"
+echo ""
+
+# 2) Configuration: correct answers and labels
+ANS=(1 0 1 0 1)
 LABELS=("Real" "Fake")
 score=0
 total=${#ANS[@]}
 
-# 1) Parse GET parameters into ANSWERS array and compute score
 declare -a ANSWERS
+# 3) Parse GET parameters into ANSWERS array and compute score
 for i in $(seq 1 $total); do
   ANSWERS[$i]=$(echo "$QUERY_STRING" | sed -n "s/.*q$i=\([^&]*\).*/\1/p")
   if [ "${ANS[$((i-1))]}" = "${ANSWERS[$i]}" ]; then
@@ -16,7 +20,7 @@ for i in $(seq 1 $total); do
   fi
 done
 
-# 2) Emit result page HTML
+# 4) Emit result page HTML header
 cat <<EOF
 <!DOCTYPE html>
 <html lang="en">
@@ -41,7 +45,7 @@ cat <<EOF
     <tr><th>Q</th><th>Your Answer</th><th>Correct Answer</th><th>Image</th></tr>
 EOF
 
-# 3) Loop through each question for detailed feedback
+# 5) Loop through each question for detailed feedback
 for i in $(seq 1 $total); do
   user=${ANSWERS[$i]}
   corr=${ANS[$((i-1))]}
@@ -58,7 +62,7 @@ for i in $(seq 1 $total); do
   echo "    </tr>"
 done
 
-# 4) Close table and add retry button
+# 6) Close table and add retry button
 cat <<EOF
   </table>
   <p style="text-align:center;"><a class="button" href="/quiz/index.html">Try Again</a></p>
