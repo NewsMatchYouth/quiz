@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# start.sh — Launch Python built-in server in CGI mode
+# start.sh — start your HTTP server in CGI mode
 
-# Ensure the CGI script is executable
+# make sure the CGI script is executable
 chmod +x cgi-bin/deepfake_quiz.cgi
 
-# Start HTTP server on PORT (or default 8000) with CGI support
+# launch the server (Render will set $PORT)
 exec python3 -m http.server "${PORT:-8000}" --cgi
